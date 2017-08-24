@@ -1,0 +1,144 @@
+Windowed Systems Notes
+
+--------------------
+------08-24-17------
+--------------------
+
+seam graph:
+	composed of nodes and subclasses of nodes
+two distinct subclasses of node:
+	-node -> parent -> REGION
+		rectangular thing that supports being laid out and CSS styling
+	-node -> parent -? GROUP
+		can have any arbitrary transformation applied to it 
+		good for neat custom graphics
+		not easy to resize
+lets say you have a window that you want to have resizable, that will move buttons and windows inside and stuff. 
+	-good news: automatically recalculates size for you in most graphics kits
+	-!!!!!!all homeworks will expect me to have a resizable interface!!!!!!
+kits often include "v boxes" and "h boxes"--meaning, rows and columns that hold stuff
+kits also have a grid type thing. it lays its area into rectilinear regions
+	-elements can go into multiple cells
+	-lets you control which areas should grow during resizing 
+anchor points help you decide where a thing attatches and keeps its location somewhat static. depends how many achor points you add
+can use grid or anchors for hw!!
+checkmarks in JavaFx
+	-some methods:
+		getIsChecked()
+		getIsCheckedProperty() -> allows binding. so if you bind the property to something else, you never have to connect them again, they just stay synched. 
+	-more on binding: can also attatch events to properties this way
+FXML
+JavaFx applications don't need a main method. they do need the start method!
+
+	public void start(Stage primary){ //stage is the window your application is in
+		primary.setTitle("Window");
+		
+		GridPane root = new GridPane(); //this is a widget, at least for JavaFx. not for Swing
+										//widgets can lay out children and is a graphical element
+	
+		primary.setScene(new Scene(root, 400, 400,)); 
+		primary.show();	//this actually displays the window
+	}
+
+lets add labels:
+
+	public void start(Stage primary){ //stage is the window your application is in
+		primary.setTitle("Window");
+		
+		GridPane root = new GridPane(); //this is a widget, at least for JavaFx. not for Swing
+										//widgets can lay out children and is a graphical element
+										
+		Label foo = new Label("foo");
+		root.add(foo, 0, 0);	//0,0 args put label in top right of grid
+		
+		Label bar = new Label("bar");
+		root.add(bar,0,1);		//this one will go just below foo
+	
+		primary.setScene(new Scene(root, 400, 400,)); 
+		primary.show();	//this actually displays the window
+	}
+	
+mess with regions:
+
+	public void start(Stage primary){ //stage is the window your application is in
+		primary.setTitle("Window");
+		
+		GridPane root = new GridPane(); //this is a widget, at least for JavaFx. not for Swing
+										//widgets can lay out children and is a graphical element
+										
+		Label foo = new Label("foo");
+		root.add(foo, 0, 0);	//0,0 args put label in top right of grid
+		
+		Region r = new Region();	//supports no args on init
+		root.add(r,1,1);	//below and to right of foo
+		
+		GridPane.setHgrow(r, Priority.ALWAYS);	//these static methods make sure that resizing
+		GridPane.setVGrow(r, Priority.ALWAYS);	//works so that bar is always in bottom right
+		
+		Label bar = new Label("bar");
+		root.add(12,2,2);
+	
+		primary.setScene(new Scene(root, 400, 400,)); 
+		primary.show();	//this actually displays the window
+	}
+	
+buttons:
+
+	public void start(Stage primary){
+		primary.setTitle("Window");
+		
+		GridPane root = new GridPane(); 
+										
+		Label foo = new Label("foo");
+		root.add(foo, 0, 0);	//0,0 args put label in top right of grid
+		
+		Region r = new Region();
+		root.add(r,1,1);	//below and to right of foo
+		
+		GridPane.setHgrow(r, Priority.ALWAYS);
+		GridPane.setVGrow(r, Priority.ALWAYS);
+		
+		Button butt = new Button("clicky");
+		root.add(butt,2,2);
+		butt.setOnAction(
+			event -> { System.out.println("clickoo"); }	//when you click, terminal prints
+		);												// you can also specify type of event
+	
+		primary.setScene(new Scene(root, 400, 400,)); 
+		primary.show();	//this actually displays the window
+	}
+	
+how to make an interface reusable:
+
+	class BasicWidget extends GridPane {
+		public BasicWidget(){
+		
+			Label foo = new Label("foo");
+			root.add(foo, 0, 0);
+			
+			Region r = new Region();
+			add(r,1,1);		//just add instead of root.add()
+			
+			GridPane.setHgrow(r, Priority.ALWAYS);
+			GridPane.setVGrow(r, Priority.ALWAYS);
+			
+			Button butt = new Button("clicky");
+			add(butt,2,2);
+			butt.setOnAction(
+				event -> { System.out.println("clickoo"); }
+			);
+		}
+	}
+	
+	public void Start(Stage primary){
+		primary.setTitle("window");
+		BasicWidget bw = new BasicWidget(); //here's the replacement!
+		primaryStage.setScene(new Scene(bw,400,400));	//bw instead of GridPane root as before
+		primary.show();
+	}
+		
+you can have multiple BasicWidgets if you want!
+
+--------------------
+------08-29-17------
+--------------------
