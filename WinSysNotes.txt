@@ -142,3 +142,234 @@ you can have multiple BasicWidgets if you want!
 --------------------
 ------08-29-17------
 --------------------
+
+New hw to be assigned this Thrusday, and then due a week later.
+
+Things we will cover today: checkbox, radio button, combobox
+	-all these things inherit the clicked event
+	-these things expose to us properties. Instead of listening for an action event, we want to use the info we would get from their interraction.
+checkbox
+	-we really just care about whether or not it's selected
+	-three options: unchecked, checked, and " - ". 
+		-some languages handle this by making it an enum type
+		-JavaFx: two boolean properties: does this box allow indeterminence? Is it checked or unchecked?
+		-in this class we are gonna ignore indeterminence. only checked and unchecked for now
+
+checkbox example:
+
+class ClassWidget extends GridPane {
+	public ClassWidget(){
+		CheckBox cb = new CheckBox("Check me!");
+		add(cb, 0, 0);
+		
+		cb.setOnAction(
+			(event) -> System.Out.Println("Hi"); //on check or uncheck, this goes to terminal
+		);
+	}
+}
+	
+getting checkbox property:
+
+class ClassWidget extends GridPane {
+	public ClassWidget(){
+		CheckBox cb = new CheckBox("Check me!");
+		add(cb, 0, 0);
+		
+		cb.setOnAction(
+			(event) -> System.Out.Println("Hi") //on check or uncheck, this goes to terminal
+		);
+			
+		Button b = new Button("Print");
+		add(b, 0, 50);		//it's okay to have a larger number for location than what's avaliable here, it works out
+		b.setOnAction(
+			(event) -> System.out.println(cb.selectedProperty().get())	//prints the state of the checkbox when you press the button
+		);
+	}
+}
+	
+In most graphical kits, there is a concept of a control being enabled or disabled. Think of greyed out windows. 
+In JavaFx, when you disable a control, the display will still be re-rendered (allowing resizing), it just can't generate events. 
+
+class ClassWidget extends GridPane {
+		public ClassWidget(){
+			CheckBox cb = new CheckBox("Check me!");
+			add(cb, 0, 0);
+			
+			cb.setOnAction(
+				(event) -> System.Out.Println("Hi")
+			);
+				
+			Button b = new Button("Print");
+			add(b, 0, 50);
+			b.setOnAction(
+				(event) -> System.out.println(cb.selectedProperty().get())
+			);
+			
+			b.disableProperty().set(true);	//note: DisableProperty is read/write, DisabledProperty is read-only
+											//it's possible for them to be different. 
+											//Disabled comes from its ancestors, Disable is specific to it. Shitty naming though lol
+}}
+	
+disable events:
+
+class ClassWidget extends GridPane {
+		public ClassWidget(){
+			CheckBox cb = new CheckBox("Check me!");
+			add(cb, 0, 0);
+				
+			Button b = new Button("Print");
+			add(b, 0, 50);
+			b.setOnAction(
+				(event) -> System.out.println(cb.selectedProperty().get())
+			);
+			
+			b.disableProperty().set(true);
+			
+			cb.setOnAction(
+				(event) ->{
+					if (cb.selectedProperty().get()){
+						b.disableProperty().set(false);
+					} else {
+						b.disableProperty().set(true);
+					}
+				}
+			);
+}}
+	
+This setup has some annoying cross-coupling. There's a better way!
+
+class ClassWidget extends GridPane {
+public ClassWidget(){
+	CheckBox cb = new CheckBox("Check me!");
+	add(cb, 0, 0);
+		
+	Button b = new Button("Print");
+	add(b, 0, 50);
+	b.setOnAction(
+		(event) -> System.out.println(cb.selectedProperty().get())
+	);
+	
+	b.disableProperty().bind(Bindings.not(cb.selectedProperty()));	//system automatically connects the properties
+	//Bindings class allows you to have a more specific binding. 
+	//In this case it inverts, allowing b's property to be inverse to cb's property.
+	//They start out in sync!!!! Binding guarentees that everything automatically updates form the start
+}}
+
+Radio buttons! Well, groups of radio buttons!
+	-it's a lot like a checkbox, except that at most, only one in a given group can be checked at a time
+	-some graphical kits allow you to have none selected, others will always have exactly one
+	-JavaFx is fine with none selected. In this case, that is "null"
+
+class ClassWidget extends GridPane {
+		public ClassWidget(){
+			CheckBox cb = new CheckBox("Check me!");
+			add(cb, 0, 0);
+			
+			ToggleGroup tga = new ToggleGroup();	//only one in a group can be selected
+				
+			RadioButton ra1 = new RadioButton("ra1");
+			add(ra1, 0, 1);
+			ra1.setToggleGroup(tga);	//ToggleGroup not exposed as a property, becuase that implies 
+										//you'd want to change the grouping later, which is dumb
+			
+			RadioButton ra2 = new RadioButton("ra2");
+			add(ra1, 0, 2);
+			ra2.setToggleGroup(tga);
+			
+			RadioButton ra3 = new RadioButton("ra3");
+			add(ra1, 1, 1);
+			ra3.setToggleGroup(tga);
+			
+			tga.selectedToggleProperty().addListener(
+				(observable, old_val, new_val) -> {
+					System.out.println("changed");	//button selection prints this
+				}
+			);
+				
+}}
+
+Above prints when there's a change! But what we would really like to know is which one is selected! So.
+
+class ClassWidget extends GridPane {
+		public ClassWidget(){
+			CheckBox cb = new CheckBox("Check me!");
+			add(cb, 0, 0);
+			
+			ToggleGroup tga = new ToggleGroup();
+				
+			RadioButton ra1 = new RadioButton("ra1");
+			add(ra1, 0, 1);
+			ra1.setToggleGroup(tga);
+			
+			RadioButton ra2 = new RadioButton("ra2");
+			add(ra1, 0, 2);
+			ra2.setToggleGroup(tga);
+			
+			tga.selectedToggleProperty().addListener(
+				(observable, old_val, new_val) -> {		//old_val and new_val are the actual RadioButtons
+					if (new_val == ra1){
+						System.out.println("ra1");
+					} else if (new_val == ra2){
+						System.out.println("ra2");
+					}
+				}
+			);
+				
+}}
+
+combo box!!! It's like a dropdown box, but a user can also type in their own new input.
+	-used to be that comboboxes were just of strings
+	-these days you can have a combobox of generics. they can be of anything... like.... aircrafts
+	-this allows a custom displays. but it's yucky. so we aren't going to bother with it in class.
+	-we're only gonna do string combo boxes for this class but maybe look into it for fun
+	
+class ClassWidget extends GridPane {
+		public ClassWidget(){
+			CheckBox cb = new CheckBox("Check me!");
+			add(cb, 0, 0);
+			
+			ComboBox<String> combo = new ComboBox<String>();	//in Java you can leave out <Type> but it'll fuck you up reel good
+			combo.getItems().addAll("One", "Two", "Three");		//by default, nothing is selected in combobox
+			add(combo, 0, 3);									//but when you pick something you can't go back to nothing
+			
+			//what if one element has more than one setOnAction thing? The most recent one is the one that happens. Set replaces instead of adds!!!!
+			Button b = new Button("Print");
+			add(b, 0, 50);
+			b.setOnAction(										//this is now dead code
+				(event) -> System.out.println(cb.selectedProperty().get())
+			);
+			
+			b.disableProperty().bind(Bindings.not(cb.selectedProperty()));
+			b.setOnAction(										//this replaces the last one
+				(event) -> System.out.println(combo.getValue())
+			);
+			
+}}
+
+class ClassWidget extends GridPane {
+		public ClassWidget(){
+			CheckBox cb = new CheckBox("Check me!");
+			add(cb, 0, 0);
+			
+			ComboBox<String> combo = new ComboBox<String>();
+			combo.getItems().addAll("One", "Two", "Three");
+			add(combo, 0, 3);
+			
+			combo.valueProperty().addListener(
+				(observable, old_val, new_val) -> {	//note: reselecting the same value doesn't 
+					System.out.println(new_val);	//count as a change, so it won't fire off this event
+				}
+			);
+			
+			Button b = new Button("Print");
+			add(b, 0, 50);
+			b.setOnAction(										//this is now dead code
+				(event) -> System.out.println(cb.selectedProperty().get())
+			);
+			
+			b.disableProperty().bind(Bindings.not(cb.selectedProperty()));
+			b.setOnAction(										//this replaces the last one
+				(event) -> System.out.println(combo.getValue())
+			);
+			
+}}
