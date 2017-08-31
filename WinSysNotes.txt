@@ -114,7 +114,7 @@ how to make an interface reusable:
 		public BasicWidget(){
 		
 			Label foo = new Label("foo");
-			root.add(foo, 0, 0);
+			add(foo, 0, 0);
 			
 			Region r = new Region();
 			add(r,1,1);		//just add instead of root.add()
