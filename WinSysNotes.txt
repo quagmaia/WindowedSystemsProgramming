@@ -373,3 +373,185 @@ class ClassWidget extends GridPane {
 			);
 			
 }}
+
+--------------------
+------08-31-17------
+--------------------
+
+Text widgets!
+
+Graphics kits can support a TextLine (single line), TextBox (multiline), and some kind of Rich Text Control (styling included). RTC can be hella complicated, and varies between graphics kits, so we won't go too deep into it for this class. Some kits don't have separate modules for TextLine and TextBox (but not JavaFx since v.2). 
+
+RW Properties in JavaFx are like "get__", "set__", and "__Property".
+
+intro to TextField:
+
+class ClassWidget extends GridPane {
+	public ClassWidget() {
+		TextField field = new TextField();
+		add(field,0,0);						//doesn't automatically reach best size
+		
+		Button butt = new Button("Print");
+		add(button,0,1);
+		butt.setOnAction(
+			(event) -> System.out.println(field.getText())	//prints field's text to terminal
+		);
+		
+		
+	}
+}
+
+you can make pressing enter also always cause print.
+
+class ClassWidget extends GridPane {
+	public ClassWidget() {
+		TextField field = new TextField();
+		add(field,0,0);
+		
+		Button butt = new Button("Print");
+		add(button,0,1);
+		butt.setOnAction(
+			(event) -> System.out.println(field.getText())
+		);
+			
+		b.setDefaultButton(true);	//button turns blue to indicate it's default, means pressing enter causes this to go
+	}
+}
+
+a different way to do it form inside textField
+
+class ClassWidget extends GridPane {
+	public ClassWidget() {
+		TextField field = new TextField();
+		add(field,0,0);
+		
+		Button butt = new Button("Print");
+		add(button,0,1);
+		butt.setOnAction(
+			(event) -> System.out.println(field.getText())
+		);
+		
+		field.setOnAction(
+			(event) -> System.out.println("Text: " + field.getText())
+		);
+		b.setDefaultButton(true);
+		
+		//Having both still only prints the first one (field.setOnAction(...) because
+		//the defaultButton thing only goes into effect IFF no one else is using that enter key
+	}
+}
+
+add TextArea
+
+class ClassWidget extends GridPane {
+	public ClassWidget() {
+		TextField field = new TextField();
+		add(field,0,0);
+		
+		Button butt = new Button("Print");
+		add(button,0,1);
+		butt.setOnAction(
+			(event) -> System.out.println(field.getText())
+		);
+		
+		field.setOnAction(
+			(event) -> System.out.println("Text: " + field.getText())
+		);
+		b.setDefaultButton(true);
+		
+		TextArea area = new TextArea();
+		add(area,0,2);
+		
+		//weirdly, the textbox and textfield reach full size of window. 
+		//they share a column, so the area made whole column got bigger, so the field grew.
+		//if you expand window, they will keep growing until textfield finds it's 
+		//default with.
+	}
+}
+
+set expand size for TextArea
+
+class ClassWidget extends GridPane {
+	public ClassWidget() {
+		TextField field = new TextField();
+		add(field,0,0);
+		
+		Button butt = new Button("Print");
+		add(button,0,1);
+		butt.setOnAction(
+			(event) -> System.out.println(field.getText())
+		);
+		
+		field.setOnAction(
+			(event) -> System.out.println("Text: " + field.getText())
+		);
+		b.setDefaultButton(true);
+		
+		TextArea area = new TextArea();
+		add(area,0,2);
+		setHgrow(area, Priority.ALWAYS);	//now that shit will grow forever. 
+		setVgrow(area, Priority.ALWAYS);	//same for textfield because it's in that column
+											//button won't grow by default
+	}
+}
+
+Time for some Rich Text!!!!!!! in JavaFx, we use an HTML editor. Now, having the DefaultButton means enter will result in print. HTML doesn't use enter because the devs were like... this is ambiguous and we're scared so we won't do it.
+Not every JavaFx distribution has HTML because life is unfair. You gotta install the preview of JDK 9.0. So if cross-platform development is important, maybe ignore the HTML becuase it's not everwhere. 
+
+class ClassWidget extends GridPane {
+	public ClassWidget() {
+		TextField field = new TextField();
+		add(field,0,0);
+		
+		Button butt = new Button("Print");
+		add(button,0,1);
+		butt.setOnAction(
+			(event) -> System.out.println(field.getText())
+		);
+		
+		field.setOnAction(
+			(event) -> System.out.println("Text: " + field.getText())
+		);
+		b.setDefaultButton(true);
+		
+		TextArea area = new TextArea();
+		add(area,0,2);
+		setHgrow(area, Priority.ALWAYS);
+		setVgrow(area, Priority.ALWAYS);
+		
+		HTML editor = new HTML();
+		add(editor,0,4);
+		//automatically has the styling buttons that most RTF editors have. 
+	}
+}
+
+field prompt text
+
+class ClassWidget extends GridPane {
+	public ClassWidget() {
+		TextField field = new TextField();
+		add(field,0,0);
+		
+		field.setPromptText("put words");
+		//text does away when you select the field
+		
+		Button butt = new Button("Print");
+		add(button,0,1);
+		butt.setOnAction(
+			(event) -> System.out.println(field.getText())
+		);
+		
+		field.setOnAction(
+			(event) -> System.out.println("Text: " + field.getText())
+		);
+		b.setDefaultButton(true);
+		
+		TextArea area = new TextArea();
+		add(area,0,2);
+		setHgrow(area, Priority.ALWAYS);
+		setVgrow(area, Priority.ALWAYS);
+		
+		HTMLEditor editor = new HTMLEditor();
+		add(editor,0,4);
+	}
+}
