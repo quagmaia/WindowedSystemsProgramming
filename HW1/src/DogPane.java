@@ -9,7 +9,7 @@ import javafx.*;
 
 /*
  * OPEN QUESTIONS:
- * Does printing clear out the output string or does it jsut keep growing forever?
+ * Does printing clear out the output string or does it just keep growing forever?
  * If the selected hasn't changed from last time does it still need to append to output?
  */
 
