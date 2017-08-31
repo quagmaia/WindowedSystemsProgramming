@@ -9,8 +9,6 @@ import javafx.*;
 
 public class DogPane extends GridPane {
 	private String output = "";
-	private String tgaVal = "";
-	private String tgbVal = "";
 	
 	public DogPane(){
 		
