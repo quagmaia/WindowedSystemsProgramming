@@ -535,7 +535,7 @@ class ClassWidget extends GridPane {
 		field.setPromptText("put words");
 		//text does away when you select the field
 		
-		Button butt = new Button("Print");
+		Button butt = new Button("Print");lr
 		add(button,0,1);
 		butt.setOnAction(
 			(event) -> System.out.println(field.getText())
@@ -555,3 +555,18 @@ class ClassWidget extends GridPane {
 		add(editor,0,4);
 	}
 }
+
+HOMEWORK! due on Sep 7th
+
+	col1		col2		col3		col4
+-----------------------------------------------------
+|	o check1	o check2				[print but]		|
+|										[submit but]	|
+|	0 ra1		0 rb1									|
+|	0 ra2		0 rb2									|
+|	0 ra3		0 rb3									|
+|														|
+-----------------------------------------------------
+
+when you hit submit, you append current status of each group/check/etc and stuff to message history.
+when you hit print, print all of message history to terminal
