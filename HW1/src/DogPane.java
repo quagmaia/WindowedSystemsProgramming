@@ -9,8 +9,8 @@ import javafx.*;
 
 /*
  * OPEN QUESTIONS:
- * Does printing clear out the output string or does it just keep growing forever?
- * If the selected hasn't changed from last time does it still need to append to output?
+ * Does printing clear out the output string or does it just keep growing forever? A: Never clear it. Unspecified, so doesn't really matter.
+ * If the selected hasn't changed from last time does it still need to append to output? I think yes.
  */
 
 public class DogPane extends GridPane {
