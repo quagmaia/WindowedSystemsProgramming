@@ -1,4 +1,5 @@
 import javafx.application.Application;
+import javafx.beans.binding.Bindings;
 import javafx.beans.property.BooleanProperty;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
@@ -35,14 +36,17 @@ public class DogPane extends GridPane {
 		RadioButton ra1 = new RadioButton("hot");
 		add(ra1, 0, 1);
 		ra1.setToggleGroup(tga);
+		ra1.disableProperty().bind(Bindings.not(checka.selectedProperty()));
 		
 		RadioButton ra2 = new RadioButton("diggity");
 		add(ra2, 0, 2);
 		ra2.setToggleGroup(tga);
+		ra2.disableProperty().bind(Bindings.not(checka.selectedProperty()));
 		
 		RadioButton ra3 = new RadioButton("dog");
 		add(ra3, 0, 3);
 		ra3.setToggleGroup(tga);
+		ra3.disableProperty().bind(Bindings.not(checka.selectedProperty()));
 		
 		////////////
 		//column 2//
@@ -56,14 +60,17 @@ public class DogPane extends GridPane {
 		RadioButton rb1 = new RadioButton("wow");
 		add(rb1, 1, 1);
 		rb1.setToggleGroup(tgb);
+		rb1.disableProperty().bind(Bindings.not(checkb.selectedProperty()));
 		
 		RadioButton rb2 = new RadioButton("amazing");
 		add(rb2, 1, 2);
 		rb2.setToggleGroup(tgb);
+		rb2.disableProperty().bind(Bindings.not(checkb.selectedProperty()));
 		
 		RadioButton rb3 = new RadioButton("perfect");
 		add(rb3, 1, 3);
 		rb3.setToggleGroup(tgb);
+		rb3.disableProperty().bind(Bindings.not(checkb.selectedProperty()));
 
 		////////////
 		//column 3//
@@ -102,14 +109,12 @@ public class DogPane extends GridPane {
 	
 	private void submitEvent(Boolean aSelected, Boolean bSelected, RadioButton aToggle, RadioButton bToggle){
 		if (aSelected){
-			String selectedToggle = aToggle.getText();
-			if (selectedToggle != null)
-				output+= " " + selectedToggle;
+			if (aToggle != null)
+				output+= " " + aToggle.getText();
 		}
 		if (bSelected){
-			String selectedToggle = bToggle.getText();
-			if (selectedToggle != null)
-				output+= " " + selectedToggle;
+			if (bToggle != null)
+				output+= " " + bToggle.getText();
 		}
 	}
 }
