@@ -559,14 +559,414 @@ class ClassWidget extends GridPane {
 HOMEWORK! due on Sep 7th
 
 	col1		col2		col3		col4
------------------------------------------------------
+---------------------------------------------------------
 |	o check1	o check2				[print but]		|
 |										[submit but]	|
 |	0 ra1		0 rb1									|
 |	0 ra2		0 rb2									|
 |	0 ra3		0 rb3									|
 |														|
------------------------------------------------------
+---------------------------------------------------------
 
 when you hit submit, you append current status of each group/check/etc and stuff to message history.
 when you hit print, print all of message history to terminal
+
+--------------------
+------09-05-17------
+--------------------
+
+Progress bar! Contains percentage done for a task. 
+Sometimes it supports an indeterminate state (goes back and forth) for when task's progress is unknown. If it stops moving that means the task froze up, that means the event loop is no logner running, so the user knows the program fucked up.
+main:
+	set-up
+	loop
+		update state
+		dispatch events
+		//idle	<- olden days!!!! break up a big job into teeny tiny ones. good for progress bar, but awkward.
+		redraw
+	clean-up
+	
+Nowadays, just use threading. good: if thread fucks up, program still tuns. bad: time gets weird. if time isn't synched, and progress bar updates during the redraw, then you get issues and you can corrupt your state. This means, with another thread, you need to do extra wiring to make things talk in a safe way. We will talk about how to do this later.
+
+For today we are just gonna hook the progress bar to a slider and worry about threads another day.
+
+Sliders! Tracks current value, min/max, and type (int, double, etc.). Different kits do it differently. 
+
+HELPFUL IMPORTS:
+	javafx.scene.layout.*;
+	javafx.scene.image.*;
+	javafx.control.*;
+	javafx.beans.*;
+
+practice time! basic progress bar
+
+class BarWidget extends GridPane{
+	public BarWidget(){
+		ProgressBar bar = new ProgressBar();
+		add(bar,0,0);		//when there's no configuration, it's just indeterminate state
+		setHgrow(bar, Priotiy.ALWAYS);
+		//the javafx fools have decided to treat progress bars like buttons, so they don't naturally change size. 
+		//so you gotta manually set size to be huge for it to grow. but this can still break shit. thanks Oracle.
+	}
+}
+
+class BarWidget extends GridPane{
+	public BarWidget(){
+		ProgressBar bar = new ProgressBar();
+		add(bar,0,0); 
+		setHgrow(bar, Priotiy.ALWAYS);
+		
+		ProgressIndicator ind = new ProgressIndicator(); //it's the spinny wheel!
+		add(ind,2,0);
+		//indeterminate when value is less than zero
+		
+		Slider slider = new Slider(-0.3, 1.0, 1.0, 0.0);
+				//note: by default progress things go form 0.0 to 1.0 while 
+				//slider goes from 0.0 to 100.0 so it obviously fills up progress fast.
+		add(slider,0,1,2,1); //extra things are span so that it goes across columns
+		
+		bar.progressProperty().bind(slider.valueProperty());	//fills up
+		int.progressProperty().bind(slider.valueProperty());	//becomes a checkbox basically
+		
+	}
+}
+
+time for container widgets and decorators. they contain other widgets and add extra bits. 
+decorators (type of containers?):
+	border widget: takes other component and draws a border around it
+	scroll: lets you scroll through a widget and it stays small
+container:
+	GridPane (duh)
+	
+class BarWidget extends GridPane{
+	public BarWidget(){
+		ProgressBar bar = new ProgressBar();
+		add(bar,0,0); 
+		setHgrow(bar, Priotiy.ALWAYS);
+		
+		ProgressIndicator ind = new ProgressIndicator();
+		add(ind,2,0);
+		
+		Slider slider = new Slider(-0.3, 1.0, 1.0, 0.0);
+		add(slider,0,1,2,1);
+		
+		bar.progressProperty().bind(slider.valueProperty());
+		int.progressProperty().bind(slider.valueProperty());
+		
+		Image img = new Image("file:trash.jpeg");
+			//takes a URI instead of a filename because fuck you that's why
+			//in something like NetBeans, image can be inside your jar file
+		ImageView iview = new ImageView(img);
+		add(iview,0,2,2,1);
+		
+	}
+}
+
+put iview in a scroll pane
+
+class BarWidget extends GridPane{
+	public BarWidget(){
+		ProgressBar bar = new ProgressBar();
+		add(bar,0,0); 
+		setHgrow(bar, Priotiy.ALWAYS);
+		
+		ProgressIndicator ind = new ProgressIndicator();
+		add(ind,2,0);
+		
+		Slider slider = new Slider(-0.3, 1.0, 1.0, 0.0);
+		add(slider,0,1,2,1);
+		
+		bar.progressProperty().bind(slider.valueProperty());
+		int.progressProperty().bind(slider.valueProperty());
+		
+		Image img = new Image("file:trash.jpeg");
+		ImageView iview = new ImageView(img);
+		
+		ScrollPane scroller = new ScrollPane();
+		add(scroller,0,1,1,2);
+		scroller.setContent(iview);
+		//note: scroller automatically dissapears when no longer needed
+	}
+}
+
+Some graphical kits automatically add invisible scrollers around the thing, just set them visible. 
+another scrolling example
+
+class PanelWidget{//custom shit};
+
+class BarWidget extends GridPane{
+	public BarWidget(){
+		ProgressBar bar = new ProgressBar();
+		add(bar,0,0); 
+		setHgrow(bar, Priotiy.ALWAYS);
+		
+		ProgressIndicator ind = new ProgressIndicator();
+		add(ind,2,0);
+		
+		Slider slider = new Slider(-0.3, 1.0, 1.0, 0.0);
+		add(slider,0,1,2,1);
+		
+		bar.progressProperty().bind(slider.valueProperty());
+		int.progressProperty().bind(slider.valueProperty());
+		
+		Image img = new Image("file:trash.jpeg");
+		ImageView iview = new ImageView(img);
+		
+		PanelWidget panel = new PanelWidget();
+		
+		ScrollPane scroller = new ScrollPane();
+		add(scroller,0,1,1,2);
+		scroller.setContent(panel);	//you can put scroll around any widget, not just an image
+	}
+}
+
+time for tabs
+
+
+class BarWidget extends GridPane{
+	public BarWidget(){
+		ProgressBar bar = new ProgressBar();
+		add(bar,0,0); 
+		setHgrow(bar, Priotiy.ALWAYS);
+		
+		ProgressIndicator ind = new ProgressIndicator();
+		add(ind,2,0);
+		
+		Slider slider = new Slider(-0.3, 1.0, 1.0, 0.0);
+		add(slider,0,1,2,1);
+		
+		bar.progressProperty().bind(slider.valueProperty());
+		int.progressProperty().bind(slider.valueProperty());
+		
+		Image img = new Image("file:trash.jpeg");
+		ImageView iview = new ImageView(img);
+		
+		PanelWidget panel = new PanelWidget();
+		
+		ScrollPane scroller = new ScrollPane();
+		add(scroller,0,1,1,2);
+		scroller.setContent(panel);
+		
+		TabPane pane = new TabPane();
+		add(pane,0,3,2,1);
+		
+		Button b = new Button("Add tab");
+		add(b,1,4);
+		b.setOnAction(
+			(event) -> {
+				Tab t = new Tab();
+				t.setText("New tab");
+				t.setContent(new ImageView(img));	//imageview need to be remade because it can only show up once
+				pane.getTabs().add(t);
+			}
+		);
+		
+		
+	}
+}
+
+--------------------
+------09-14-17------
+--------------------
+
+We are going to do an extra class on menus, may do classes on other toolkits. This is to not be too ahead of syllabus. Also attendance is gonna be a thing. 
+
+Windows and dialog boxes
+
+When you get multiple windows, how do you know when to close your application? Different toolkits deal with it differently. JavaSwing has a Window.OnClose() event. JavaFX and others by default end the application when all visible windows have closed. 
+
+Modality--tells us the stacking order of a window. So if A can create B, A can OPTIONALLY e B's parent. With modality, as long as B is active, it blocks A and prevents interraction with A. A isn't necessarily disabled, it still renders and stuff, you just can't input anyhting. In JavaFX you need the parent relationship for this to work.
+
+Consider a button in window A that shows window B. Normally, both windows are still inside a single event loop. 
+event {
+	callback {
+		Window B = new BWin();
+		B.BlockingShow(); 		//so if this is where program waits for input then
+		print(B.property()); 	//to not break everything, it must spawn a new event loop
+	}
+}
+
+Almost every windowing kit on the planet lets you do dialog boxes, and lets you skip all the extra steps of dealing with regular windows. 
+Two types we'll cover: alerts and file choosers. Color pickers and prints are others that often exist. JavaFX's alert doesn't look like the system's alert. The file browser does though!
+
+public class RunnerWindow extends Application{
+	@Override
+	public void start(Stage primaryStage){
+		AlertWidget aw = new AlertWidget();
+		aw.setAlightment(Pos.CENTER);
+		
+		primaeyStage.setTitle("inclass");
+		primaryStage.setScnene(new Scene(aw,400,400);
+		primaryStage.show();
+	}
+}
+
+public class AlertWidget extends GridPane{
+	public AlertWidget(){
+	
+		Button windowB = new Button("Window");
+		add(windowB,0,0);
+		WindowB.setOnAction(
+			event -> {
+				Stage s = new Stage();
+				s.setTitle("new stage");
+				s.show();
+			}
+		)
+		//this new window returns to the main event loop so you aren't blocking this AlertWidget with windowB
+		//all windows must be closed for app to end
+		
+	}
+	
+	private Window getOwnerWindow(){ //you have to build this helper yourself :/
+		Scene parentScene = this.getScene(); //is null when if it's never added to a node in the scene. 
+		if (parentScene != null){
+			return parentScene.getWindow();	//still nullable!! if scene hasn't been added to a window
+		}
+		return null;
+	}
+}
+
+if you want to make your new stage modal with respect to the parent:
+
+public class AlertWidget extends GridPane{
+	public AlertWidget(){
+	
+		Button windowB = new Button("Window");
+		add(windowB,0,0);
+		WindowB.setOnAction(
+			event -> {
+				Stage s = new Stage();
+				s.setTitle("new stage");
+				s.initModality(Modality.WINDOW_MODAL);
+				//modality can be to Application, Window, None. determines what gets blocked
+				//for window modality you need to set the parent!
+				s.initOwner(this.getOwnerWindow());
+				s.showAndWait();
+			}
+		)
+	}
+	
+	private Window getOwnerWindow(){ 
+		Scene parentScene = this.getScene();
+		if (parentScene != null){
+			return parentScene.getWindow();
+		}
+		return null;
+	}
+}
+
+more stuff with modality
+
+
+public class AlertWidget extends GridPane{
+	public AlertWidget(){
+	
+		Button windowB = new Button("Window");
+		add(windowB,0,0);
+		WindowB.setOnAction(
+			event -> {
+				Stage s = new Stage();
+				s.setTitle("new stage");
+				s.initModality(Modality.WINDOW_MODAL);
+				s.initStyle(StageStyle.Decorated); //or Undecorated for no header bit, so there's not even a close button
+				s.setScene(new Scene(new PanelWidget()));
+				s.initOwner(this.getOwnerWindow());
+				s.showAndWait();
+			}
+		)
+	}
+	
+	private Window getOwnerWindow(){ 
+		Scene parentScene = this.getScene();
+		if (parentScene != null){
+			return parentScene.getWindow();
+		}
+		return null;
+	}
+}
+
+basic alert
+
+public class AlertWidget extends GridPane{
+	public AlertWidget(){
+	
+		Button windowB = new Button("Window");
+		add(windowB,0,0);
+		WindowB.setOnAction(
+			event -> {
+				Stage s = new Stage();
+				s.setTitle("new stage");
+				s.initModality(Modality.WINDOW_MODAL);
+				s.initStyle(StageStyle.Decorated); //or Undecorated for no header bit, so there's not even a close button
+				s.setScene(new Scene(new PanelWidget()));
+				s.initOwner(this.getOwnerWindow());
+				s.showAndWait();
+			}
+		);
+		
+		Button alertB = new Button("Alert");
+		add(alert,1,0);
+		alertB.setOnAction(
+			event -> {
+				Alert a = new Alert(AlertType.CONFIRMATION);
+				a.showAndWait();
+				//automatically blocks other windows
+			}
+		);
+	}
+	
+	private Window getOwnerWindow(){ 
+		Scene parentScene = this.getScene();
+		if (parentScene != null){
+			return parentScene.getWindow();
+		}
+		return null;
+	}
+}
+
+better alert
+
+public class AlertWidget extends GridPane{
+	public AlertWidget(){
+	
+		Button windowB = new Button("Window");
+		add(windowB,0,0);
+		WindowB.setOnAction(
+			event -> {
+				Stage s = new Stage();
+				s.setTitle("new stage");
+				s.initModality(Modality.WINDOW_MODAL);
+				s.initStyle(StageStyle.Decorated); //or Undecorated for no header bit, so there's not even a close button
+				s.setScene(new Scene(new PanelWidget()));
+				s.initOwner(this.getOwnerWindow());
+				s.showAndWait();
+			}
+		);
+		
+		Button alertB = new Button("Alert");
+		add(alert,1,0);
+		alertB.setOnAction(
+			event -> {
+				Alert a = new Alert(AlertType.CONFIRMATION, "Class is almost over!", ButtonType.OK, ButtonType.FINISH); 
+				//Java's being like C#, doing the var args thing. Infinite button arguments allowed!
+				Optional<ButtonType> result = a.showAndWait(); //this returns the selected button
+				//Optional is a trivial object that allows result to be present or null. ButtonType is an enum and can't be null so you gotta do it
+				//Optional is in Java.util
+				if (result.isPresent() && result.get() == ButtonType.OK){
+					System.out.println("Woo");
+				}
+			}
+		);
+	}
+	
+	private Window getOwnerWindow(){ 
+		Scene parentScene = this.getScene();
+		if (parentScene != null){
+			return parentScene.getWindow();
+		}
+		return null;
+	}
+}
+
+
