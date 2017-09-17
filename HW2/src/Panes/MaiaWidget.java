@@ -1,3 +1,4 @@
+package Panes;
 import javafx.application.Application;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.BooleanProperty;
@@ -25,11 +26,13 @@ public class MaiaWidget extends GridPane {
 		numTab.setText("Number Information");
 		numTab.setContent(new NumInfo());
 		pane.getTabs().add(numTab);
-		
+	    
+	    
 		Tab guessTab = new Tab();
 		guessTab.setText("Guessing Game");
 		guessTab.setContent(new GuessingGame());
 		pane.getTabs().add(guessTab);
+		
 	}
 }
 

@@ -1,15 +1,16 @@
-import javafx.scene.layout.GridPane;
+package Panes;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
 
 public class NumInfo extends GridPane {
 
 	public NumInfo() {
-
+		
 		TextField input = new TextField();
 		input.setText("");
+		setHgrow(input,Priority.ALWAYS);
 		add(input, 0, 0);
-
+		
 		ComboBox<String> combo = new ComboBox<String>();
 		combo.getItems().addAll("Even", "Prime");
 		add(combo, 1, 0);
@@ -18,13 +19,14 @@ public class NumInfo extends GridPane {
 		output.setEditable(false);
 		output.setWrapText(true);
 		setHgrow(output,Priority.ALWAYS);
-		add(output, 0, 1);
+		add(output, 0, 1,3,1);
 
 		Button run = new Button("Run");
 		add(run, 2, 0);
 		run.setOnAction((event) -> {
 			try {
-				int givenInt = checkInput(input.getText());
+				String stringInput = input.getText(); 
+				int givenInt = checkInput(stringInput);
 				Boolean givenIntIsPositive = givenInt >= 0; // if negative, it
 															// errored out
 				if (givenIntIsPositive) {
@@ -32,19 +34,19 @@ public class NumInfo extends GridPane {
 					Boolean checkForPrime = combo.getValue().equals("Prime");
 					if (checkForEven) {
 						if (isEven(givenInt)) {
-							output.appendText(givenInt + " is even. ");
+							output.appendText(stringInput + " is even. ");
 						} else {
-							output.appendText(givenInt + " is odd. ");
+							output.appendText(stringInput + " is odd. ");
 						}
 					} else if (checkForPrime) {
 						if (isPrime(givenInt)) {
-							output.appendText(givenInt + " is prime. ");
+							output.appendText(stringInput + " is prime. ");
 						} else {
-							output.appendText(givenInt + " is not prime. ");
+							output.appendText(stringInput + " is not prime. ");
 						}
 					}
 				} else {
-					output.appendText(input.getText() + " is not a valid number, please enter a valid number! ");
+					output.appendText(stringInput + " is not a valid number, please enter a valid number! ");
 				}
 			} catch (Exception e) {
 				output.appendText("Please select Even or Prime. ");
@@ -55,6 +57,8 @@ public class NumInfo extends GridPane {
 	}
 
 	private Boolean isPrime(int value) {
+		if (value == 2)
+			return true;
 		if (isEven(value))
 			return false;
 		if (value == 0 || value == 1)
