@@ -969,4 +969,140 @@ public class AlertWidget extends GridPane{
 	}
 }
 
+--------------------
+------08-31-17------
+--------------------
 
+Menus
+
+public class AlertWidget extends GridPane{
+	public AlertWidget(){
+	
+		Button window = new Button("Window");
+		add(window,0,0);
+		Window.setOnAction(
+			event -> {
+				Stage s = new Stage();
+				s.setTitle("new stage");
+				s.initModality(Modality.WINDOW_MODAL);
+				s.initStyle(StageStyle.Decorated); //or Undecorated for no header bit, so there's not even a close button
+				s.setScene(new Scene(new PanelWidget()));
+				s.initOwner(this.getOwnerWindow());
+				s.showAndWait();
+			}
+		);
+		
+		Button alert = new Button("Alert");
+		add(alert,1,0);
+		alertB.setOnAction(
+			event -> {
+				Alert a = new Alert(AlertType.CONFIRMATION, "Class is almost over!", ButtonType.OK, ButtonType.FINISH); 
+				//Java's being like C#, doing the var args thing. Infinite button arguments allowed!
+				Optional<ButtonType> result = a.showAndWait(); //this returns the selected button
+				//Optional is a trivial object that allows result to be present or null. ButtonType is an enum and can't be null so you gotta do it
+				//Optional is in Java.util
+				if (result.isPresent() && result.get() == ButtonType.OK){
+					System.out.println("Woo");
+				}
+			}
+		);
+	}
+	
+	//here's the new thing
+	Button save = new Button("Save");
+	add(save,2,0);
+	save.setOnAction(
+		(event) -> {
+			FileChooser chooser = new FileChooser();
+			chooser.setTitkle("Choose a file");
+					//there's also a way to do this where you only check for a single file
+			List<File> fs = chooser.showOpenMultipleDialog(getOwnerWindow);
+					//it can return null so you need to check for it
+			if (fs != null){
+				for (File f: fs){
+					System.out.println(f.getName());
+				}
+			} else {
+				System.out.println("Nothing was selected.");
+			}
+		}
+	);
+	
+	private Window getOwnerWindow(){ 
+		Scene parentScene = this.getScene();
+		if (parentScene != null){
+			return parentScene.getWindow();
+		}
+		return null;
+	}
+}
+
+now file searching but with filters (so its like *.jpeg)
+
+public class AlertWidget extends GridPane{
+	public AlertWidget(){
+	
+		Button window = new Button("Window");
+		add(window,0,0);
+		Window.setOnAction(
+			event -> {
+				Stage s = new Stage();
+				s.setTitle("new stage");
+				s.initModality(Modality.WINDOW_MODAL);
+				s.initStyle(StageStyle.Decorated); //or Undecorated for no header bit, so there's not even a close button
+				s.setScene(new Scene(new PanelWidget()));
+				s.initOwner(this.getOwnerWindow());
+				s.showAndWait();
+			}
+		);
+		
+		Button alert = new Button("Alert");
+		add(alert,1,0);
+		alertB.setOnAction(
+			event -> {
+				Alert a = new Alert(AlertType.CONFIRMATION, "Class is almost over!", ButtonType.OK, ButtonType.FINISH); 
+				//Java's being like C#, doing the var args thing. Infinite button arguments allowed!
+				Optional<ButtonType> result = a.showAndWait(); //this returns the selected button
+				//Optional is a trivial object that allows result to be present or null. ButtonType is an enum and can't be null so you gotta do it
+				//Optional is in Java.util
+				if (result.isPresent() && result.get() == ButtonType.OK){
+					System.out.println("Woo");
+				}
+			}
+		);
+	}
+	
+	//here's the new thing
+	Button save = new Button("Save");
+	add(save,2,0);
+	save.setOnAction(
+		(event) -> {
+			FileChooser chooser = new FileChooser();
+			chooser.setTitle("Choose a file");
+			
+			chooser.getExtensionFilters().addAll(
+				new ExtensionFilter("Source files","*.java", "*.py"),
+				new ExtensionFilter("All Files","*");
+			);
+			//these extension filters show up in chooser and allow user to select between them
+			
+			List<File> fs = chooser.showOpenMultipleDialog(getOwnerWindow);
+			
+			if (fs != null){
+				for (File f: fs){
+					System.out.println(f.getName());
+				}
+			} else {
+				System.out.println("Nothing was selected.");
+			}
+		}
+	);
+	
+	private Window getOwnerWindow(){ 
+		Scene parentScene = this.getScene();
+		if (parentScene != null){
+			return parentScene.getWindow();
+		}
+		return null;
+	}
+}
