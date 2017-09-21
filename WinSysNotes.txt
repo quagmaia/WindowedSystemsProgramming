@@ -970,7 +970,7 @@ public class AlertWidget extends GridPane{
 }
 
 --------------------
-------08-31-17------
+------09-19-17------
 --------------------
 
 Menus
@@ -1106,3 +1106,274 @@ public class AlertWidget extends GridPane{
 		return null;
 	}
 }
+
+--------------------
+------09-21-17------
+--------------------
+
+Menus! It's always pushed against the top of the container and is as wide as its parent. 
+javafx.scene.control.MenuBar 	-> represents the entire bar
+javafx.scene.control.Menu 		-> represents the items inside the menu. File, edit, etc.
+javafx.scene.control.MenuItem	-> represents the submenus inside file, edit, etc
+
+In other kits there is the concept of the abstract command. A command is a single point of implementation for some piece of application state. The idea is that if you have one [[ edit > cut ]] option, you have to store whatever's selected into the clipboard. Command allows you to package the action you do with the application state, plus other needed references, to do the thing. WPF and JavaSwing both have these things, and they're useful as hell.
+Java FX doens't have it. You can kind of acheive the same result with action listeners. ActionListener<ActionEvent> { .... } won't be covered in class but it's an option for projects.
+
+We're going to make a menu bar with one menu and one submenu. Going to start form the bottom up, just because it's easier. This time we're extending from VBox instead of GridPane, it's a layout container, too, just easier to get the menu where you want it. 
+
+class MenuWidget extends VBox {
+	class MenuWidget(){
+		MenuBar bar = new MenuBar();
+		Menu menu = new Menu("File");
+		
+		MenuItem open = new MenuItem("Open");
+		MenuItem save = new MenuItem("Save");
+		
+		menu.getItems().addAll(open, save);
+		
+		this.getChildren().addAll(menu);
+	}
+}
+
+At its current state, the menu bar is in the middle of the window! It's just a normal node, not meant to be attatched to the top by default. Gotta fix the location by setting the vertical grow priority.
+
+class MenuWidget extends VBox {
+	class MenuWidget(){
+		MenuBar bar = new MenuBar();
+		Menu menu = new Menu("File");
+		
+		MenuItem open = new MenuItem("Open");
+		MenuItem save = new MenuItem("Save");
+		
+		menu.getItems().addAll(open, save);
+		
+		this.getChildren().addAll(menu);
+		
+		GridPane pane = new GridPane();
+		this.getChildren().add(pane);
+		VBox.setVgrow(panel, Priority.ALWAYS); //static method so can't use keyword this
+		//now the menu's at the top!
+	}
+}
+
+Remember that the gridpane takes its size from its largest child. At this time it has no children. A GridPane with growth priotity always has a size of zero in the top left corner, but it has an allocation of the entire white space of the window below the menu, and that's why the menu is pushed to the top. 
+
+class MenuWidget extends VBox {
+	class MenuWidget(){
+		MenuBar bar = new MenuBar();
+		Menu menu = new Menu("File");
+		
+		MenuItem open = new MenuItem("Open");
+		MenuItem save = new MenuItem("Save");
+		
+		menu.getItems().addAll(open, save);
+		
+		this.getChildren().addAll(bar);
+		
+		GridPane pane = new GridPane();
+		this.getChildren().add(pane);
+		VBox.setVgrow(panel, Priority.ALWAYS); //static method so can't use keyword this
+		//now the menu's at the top!
+		
+		pane.setStyle("-fx-grid-lines-visible: true; -fx-stroke: black;"); //adds gridlines that aren't debugger lines
+		
+		Button b = new Button("b");
+		pane.add(b,0,0);
+		
+		//when you run itll show that the box only extends to the exact size of the button.
+		
+	}
+}
+
+adding actions to menu items.
+
+Note: vboxes have it so that all children by default get the full horizontal allocation, which is good for menus! Thigns like the progress bar still won't grow because Oracle loves to make questionable choices.
+
+class MenuWidget extends VBox {
+	class MenuWidget(){
+		MenuBar bar = new MenuBar();
+		Menu menu = new Menu("File");
+		
+		MenuItem open = new MenuItem("Open");
+		MenuItem save = new MenuItem("Save");
+		
+		GridPane pane = new GridPane();
+		this.getChildren().add(pane);
+		VBox.setVgrow(panel, Priority.ALWAYS);
+		
+		save.onAction(
+			(event) -> {
+				System.out.println("save clicked");
+				
+			}
+		);
+		
+		SeperatorMenuItem sep = new SeperatorMenuItem();
+		
+		Menu recents = new Menu("Recent items");
+		
+		MenuItem lies = new MenuItem("Lies");
+		MenuItems secrets = new MenuItem("Secrets");
+		
+		recents.getItems().addAll(lies, secrets);
+		
+		menu.getItems().addAll(open, save, sep, recents);
+		
+		bar.getMenus().addAll(menu);
+		
+		this.getChildren().addAll(bar);
+		
+	}
+}
+
+Now it's time to switch languages! GTK3 in Python! But in Python, Qt is better, but David Bolding has never used it so can't easily teach it to us on short notice. GTK3 is a little bit weird, it's very old and has been around for a long time. GIMP, that image program, had a graphical abstraction layer, and they branched it off into its own opensource toolkit. Most applications on Linux use it.
+
+GTK was originally done in C. So they made the glib library, which is object oriented for C. It builds pseudo object oriented techniques using C macros on top of C structs. If you actually write a GTK program in C, it'll be super verbose. It's awkward and impractical. Because of this, GTK has branched out to other languages. They even made the language Vala, which looks like C#, but compiles into C, so there are some weird limitations (like no exceptions!)
+
+So, python. You could use PYGTK, but its slow to update and only works up to v2. So for v3 onward, use Python G-object introspection. Introspection means, given an object you know nothing about, you can still load it up and use it. 
+
+Is it reflection?? Kinda but no. See https://en.wikipedia.org/wiki/Type_introspection
+
+With introspection, intellisense won't work, because it wants to see the whole library. That's because when you use introspection, the namespace is filled in at runtime, which just isn't compatible. 
+
+Note: GTK appllications aren't the most Windows friendly. It's meant for Linux.
+
+{
+
+#! /usr/bin/python3
+
+import gi
+gi.require_version("Gtk","3.8");
+from gi.repository import Gtk
+
+win = Gtk.Window(title="Weakly-Typed window")
+
+win.connect("delete-event". Gtk.main_quit)
+	//this makes it to the exit button actually ends the program
+	//.main_quit is a function that actually does the shut down action
+
+win.show_all() //shows this window and any of its children
+
+
+Gtk.main()
+
+}
+
+Weakly typing is similar to dynamic typing (where vars can change types). Weak typing means they don't have a well-defined type at runtime. A type is decided based on methods it has. So it doesn't enforce type restrictions, and python assumes you're following the rules. Doesn't this make it slower?
+
+Python is functional, you can can carry functions around like variables and just give it to stuff. Good for this!
+
+{
+
+#! /usr/bin/python3
+
+import gi
+gi.require_version("Gtk","3.8");
+from gi.repository import Gtk
+
+win = Gtk.Window(title="Weakly-Typed window")
+
+hbox = Gtk.Box()
+win.add(hbox)
+
+firstB = Gtk.Button.new_with_label(label="first!")
+	//.new_with_label() is a factory method!!!!!!
+hbox.pack_start(firstB, True, True, 3)
+	//packs in from the beginning of the box. with an hbox the beginning is the left. it's like a load-in bay??
+	//second is grow allocation
+	//third if fill 
+	//fourth is padding
+	//so this appears in the very center of the window because its allocation lets it!!! 
+	//there's padding around the left and right edes of the window outside the allocation
+
+win.connect("delete-event". Gtk.main_quit)
+
+win.show_all()
+
+
+Gtk.main()
+
+}
+
+more on this
+
+{
+
+#! /usr/bin/python3
+
+import gi
+gi.require_version("Gtk","3.8");
+from gi.repository import Gtk
+
+win = Gtk.Window(title="Weakly-Typed window")
+
+hbox = Gtk.Box()
+win.add(hbox)
+
+firstB = Gtk.Button.new_with_label(label="first!")
+hbox.pack_start(firstB, False, True, 3)
+	//grow is false, now button is on left side. stille xpands infinitely vertically, because it fills the row basically
+	//if fill is false as well, it is the same as before. this is because the allocation doens't change, so fill won't either
+	//if grow is true and fill is false, it hits its preferred horizontal size and lands right in the middle of the window.
+
+win.connect("delete-event". Gtk.main_quit)
+
+win.show_all()
+
+
+Gtk.main()
+
+}
+
+There's Glade, a graphical Gtk builder. Niiice.
+
+{
+
+#! /usr/bin/python3
+
+import gi
+gi.require_version("Gtk","3.8");
+from gi.repository import Gtk
+
+win = Gtk.Window(title="Weakly-Typed window")
+
+hbox = Gtk.Box()
+win.add(hbox)
+
+firstB = Gtk.Button.new_with_label(label="first!")
+hbox.pack_start(firstB, False, True, 3)
+
+secondB = Gtk.Button.new_with_mnemonic(label="second")
+secondB.connect("clicked", lambda widget: print("I was clicked"))
+	//^ this is a lambda expression!!!! 
+	//widget is the argumement name, thing after the colon is what to do next
+hbox.packstart(secondB,True,True,3)
+
+win.connect("delete-event". Gtk.main_quit)
+
+win.show_all()
+
+class ExWindow(Gtk.Window):
+	def __init__(self, title):
+		super().__init__(title=title)
+		
+		hbox = Gtk.Box()
+		butt = Gtk.Button.new_with_mnenomic(labek="click me")
+		butt.connect("clicked",self.clicked)
+		hbox.pack_start(butt, true,true,10)
+		self.add(hbox)
+		
+	def clicked(self,source):
+		print("clicked")
+		
+e.exWindow(title="hot potato")
+e.show_all()
+
+Gtk.main()
+
+}
+
+In python, self is basically this. def __init(self) is a constructor. You have to explicitly call your superclass's constructor. 
+self.clicked in butt.connect("clicked",self.clicked) is actually a bound method. This means the e object gets a clicked method that has one argument, and just calls that. so what's happening is this: e.clicked = lambda source: ExWindow.clicked(e, source)
+Basically, it's a weird method that, behind the scenes, magics its way into working. Magic is the worst. 
+
