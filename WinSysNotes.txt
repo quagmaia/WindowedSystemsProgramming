@@ -1014,7 +1014,7 @@ public class AlertWidget extends GridPane{
 	save.setOnAction(
 		(event) -> {
 			FileChooser chooser = new FileChooser();
-			chooser.setTitkle("Choose a file");
+			chooser.setTitle("Choose a file");
 					//there's also a way to do this where you only check for a single file
 			List<File> fs = chooser.showOpenMultipleDialog(getOwnerWindow);
 					//it can return null so you need to check for it
