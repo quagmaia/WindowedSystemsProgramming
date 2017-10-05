@@ -1377,3 +1377,178 @@ In python, self is basically this. def __init(self) is a constructor. You have t
 self.clicked in butt.connect("clicked",self.clicked) is actually a bound method. This means the e object gets a clicked method that has one argument, and just calls that. so what's happening is this: e.clicked = lambda source: ExWindow.clicked(e, source)
 Basically, it's a weird method that, behind the scenes, magics its way into working. Magic is the worst. 
 
+--------------------
+------10-05-17------
+--------------------
+
+FXML! Note, Java cannot tightly integrate with FXML like some other kits do. If you are using an IDE to get FXML into your application, the steps to take will be different than what the professor does. He does uses FileStream to read layout.fxml but I can't necessarily do that.
+
+public void Start(Stage stage){
+	try {
+		FileInputStream istream = new FileInputStream("layout.fxml");
+		FXMLLoader loader = new FXMLLoader();
+		Parent root = loader.load(istream);
+		
+		Scene scene = new scene(root, 600, 600);
+		
+		stage.setTitle("A test");
+		stage.setScene(scene);
+		
+		stage.show();
+	} catch (exception e){
+		System.out.print(e.getMessege());
+	}
+}
+
+Layout.fxml
+
+	<xml version="1.0" encoding="UTF-8"?>
+	<?language javascript>
+
+	<?import java.net.*?>
+	<?import javafx.geometry.*?>
+	<?import javafx.scene.control.*?>
+	<?import javafx.scene.layout.*?>
+	<?import javafx.scene.text.*?>
+	<?import javafx.scene.web.*?>
+
+	<GridPane fx:controller="Controller"
+		xmlns:fx="http://javafx.com/fxml" alignment"center" hgap="10" vgap="10">
+		
+		<TextField text="Sample Text" fx::id="tf"
+			GridPane.columnIndex="0" GridPane.RowIndex="0" />
+		
+		<Button text="Click Me"
+			GridPane.columnIndex="0" GridPane.RowIndex="1" 
+			onAction="tf.setText('clicked');"/>
+			
+	</GridPane>
+
+Doing the same onAction but with a script!
+
+	<xml version="1.0" encoding="UTF-8"?>
+	<?language javascript>
+
+	<?import java.net.*?>
+	<?import javafx.geometry.*?>
+	<?import javafx.scene.control.*?>
+	<?import javafx.scene.layout.*?>
+	<?import javafx.scene.text.*?>
+	<?import javafx.scene.web.*?>
+
+	<GridPane fx:controller="Controller"
+		xmlns:fx="http://javafx.com/fxml" alignment"center" hgap="10" vgap="10">
+		
+		<fx::script>
+			function handle_click(event){
+				tf.setText("clicked!");
+			}
+		</fx::script>
+		
+		<TextField text="Sample Text" fx::id="tf"
+			GridPane.columnIndex="0" GridPane.RowIndex="0" />
+		
+		<Button text="Click Me"
+			GridPane.columnIndex="0" GridPane.RowIndex="1" 
+			onAction="handle_clicked(event)"/>
+			
+	</GridPane>
+	
+Note that "Controller" is the name of the class here. If it were in a package it would be named Package.Controller or something. Here is how you link a Java class to an FXML class.
+
+import javafx.fxml.FXML;
+import javafx.scene.control.*;
+import javafx.event.ActionEvent;
+
+public class Controller{
+	//FXML is linked to the java class via introspection. 
+	@FXML protected TextField tf = null;
+	
+	@FXML protected void handle_click_java(ActionEvent e){
+		tf.setText("handled in java");
+	}
+}
+
+<xml version="1.0" encoding="UTF-8"?>
+	<?language javascript>
+
+	<!-- import statements --/>
+
+	<GridPane fx:controller="Controller"
+		xmlns:fx="http://javafx.com/fxml" alignment"center" hgap="10" vgap="10">
+		
+		<fx::script>
+			function handle_click(event){
+				tf.setText("clicked!");
+			}
+		</fx::script>
+		
+		<TextField text="Sample Text" fx::id="tf"
+			GridPane.columnIndex="0" GridPane.RowIndex="0" />
+		
+		<Button text="Click Me"
+			GridPane.columnIndex="0" GridPane.RowIndex="1" 
+			onAction="#handle_click_java)"/>
+			
+	</GridPane>
+	
+Adding more widgets!!
+
+<xml version="1.0" encoding="UTF-8"?>
+	<?language javascript>
+
+	<!-- import statements --/>
+
+	<GridPane fx:controller="Controller"
+		xmlns:fx="http://javafx.com/fxml" alignment"center" hgap="10" vgap="10">
+		
+		<fx::script>
+			function handle_click(event){
+				tf.setText("clicked!");
+			}
+		</fx::script>
+		
+		<TextField text="Sample Text" fx::id="tf"
+			GridPane.columnIndex="0" GridPane.RowIndex="0" />
+		
+		<Button text="Click Me"
+			GridPane.columnIndex="0" GridPane.RowIndex="1" 
+			onAction="#handle_click_java)"/>
+			
+		<ProgressBar
+			Progress="${sb.value}"
+			GridPane.RowIndex="1" GridPane.ColumnSpan="2" 
+			/>
+			
+		<ScrollBar fx::id="sb"
+			GridPane.RowIndex="2" GridPane.ColumnSpan="2" 
+			min="0.0" max="1.0" />
+			
+	</GridPane>
+	
+Some gotchas: the corresponding Java class MUST be public, even if its members can be protected or private. 
+Note, multiple FXML files can have the same Java file!!! Whaaaat
+
+Next we're gonna learn about Glade!!!!! That's me!!! It's in python, UI generates XML stuff.
+
+	import gi
+	gi.require+version("Gtk", '3,0")
+	from gi.repository import Gtk
+
+	builder = Gtk.Builder()
+	builder.add_from_file("ex.glade") 	//ex.glade is the generated xml file
+
+	def handle(source):
+		print("clicked")
+	
+	callbacks = {
+		//creates a dictionary where "handle_click" refers to this function
+		"handle_click": handle
+	}
+	
+	print(type(callbacks["handle_click"]))
+	
+	ex = builder.get_object("ex")
+	ex.show_all()
+
+	Gtk.main()
