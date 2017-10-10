@@ -1552,3 +1552,63 @@ Next we're gonna learn about Glade!!!!! That's me!!! It's in python, UI generate
 	ex.show_all()
 
 	Gtk.main()
+	
+	
+--------------------
+------10-10-17------
+--------------------
+
+How to pass ifo between classes. What if you want to start a download in one widget by pressing a button in a different widget? You need special listeners and custom events to preserve encapsulation and still do the thing.
+
+The Observer Pattern
+	Event callback system. Hinges on an interface called a Handler, with a single function handle(). The subject emits widgets, and has as a member, a list of handlers. When the subject wants to emit an event, it loops over its list of handlers and calls each handle function. We also have the ability to add a new handler to the list with addHandler(). 
+	So you could make a new class extend Handler and then override the handle() method. Java doesn't have its own default high level event system, you have to implement it yourself kind of. 
+	
+So for URLWidget, which needs to output a url for DownloadWidget to download from, you'd need to use the custom interface URLHandler. It might have a method like handleUrl(string url) which returns void. Note, some kits let you return something nonvoid for handle methods, but it isn't absolutely necessary.
+Then, in the URLWidget, you need to have something like 
+		for (h : urlHandlers){ h.handleUrl(blah.getText()); }
+You would put that inside the callback for the event that you want to effect the other DownloadWidget. 
+
+In Python you can do something like:
+	callbacks = list()
+	def my_cb()
+		pall
+	callbacks.append(my_cb)
+	for cb in callbacks:
+		cb()
+
+In C# it is of course the best. 
+	
+	delegate void
+		handle_url(String url)
+		
+	class MyClass{
+		event handle_url
+			url_submitted;
+	}
+	
+		MyClass.url_submitted += () => Console.WriteLine();
+		
+Example time! (In Java)
+
+public interface TestObserver extends Handler {
+	public void Notify();
+}
+
+public class TestSubject{
+	private Vector<TestObserver> observers = new Vector<Observers>
+	
+	public void AddTestEvent(TestObserver to){
+	observers.add)to);
+	
+	public void removeTestEvent(TestObserver to){
+		observers.remove(to);
+	}
+	
+	public void fireTestEvent(){
+		for (TestObserver to: obserbers)
+			to.Notify();
+	}
+}
+
+In our HWs, TestSubject would just be whatever graphical class we're working on. If HW requires us to do an event handling thing, that's 50% off the grade.
