@@ -1612,3 +1612,65 @@ public class TestSubject{
 }
 
 In our HWs, TestSubject would just be whatever graphical class we're working on. If HW requires us to do an event handling thing, that's 50% off the grade.
+
+--------------------
+------10-12-17------
+--------------------
+
+Event handling example. 
+
+@FunctionalInterface
+public interface BasicHandler {
+	public void handle(String string);
+}
+
+public class BasicWidget extends GridPane{
+	
+	public Vector<BasicHandler> handlers = new Vector<BasicHandler>();
+	
+	public BasicWidget(){
+		TextField tf = new TextField();
+		add(tf,0,0);
+		
+		Button b = new Button("Submit");
+		add(b,1,0);
+		
+		b.setOnAction(
+			(event) -> {
+				String str = tf.getText();
+				for (BasicHandler bh : handlers) {
+					bh.handle(str);
+				}
+			}
+		);
+	}
+	
+	public addBasicHandler(BasicHandler bh){
+		handlers.add(bh);
+	}
+}
+
+public class BasicRunner extends Application {
+	@override
+	public void start(Stage stage) {
+		BasicWidget root = new BasicWidget();
+		root.addBasicHandler{
+			(String str) -> System.out.println(str);
+		}
+	);
+	
+	Scene scene = new Scene();
+	stage.setScene(scene);
+	stage.show();
+}
+
+How to do this for FXML? Really similar to old FXML example, just include those extra bits for handling.
+
+Next up: the MVC pattern! 
+
+Model: It's nongraphical. It knows how to perform the actual tasks you want to perform, or use other components that do. It has functions to start operations and it has events to report status.
+View: display current state. It doesn't know about the model. It has events to represent user action and functions to display states.
+Controller: Defines the behavior of the interface of viewer and ties model and view together. Model and view shouldn't talk directly to eachother, they don't know eachother!
+
+Say you have a main window with two parts, red and green. Green contains a text field next to a button. Red contains a list of progress bars with cancel buttons. There is also a download engine. It is most reasonable to break this up into smaller widgets. This can get complicated when widgets need to talk to eachother. 
+You could argue the Donwload engine is a model 
