@@ -1674,3 +1674,115 @@ Controller: Defines the behavior of the interface of viewer and ties model and v
 
 Say you have a main window with two parts, red and green. Green contains a text field next to a button. Red contains a list of progress bars with cancel buttons. There is also a download engine. It is most reasonable to break this up into smaller widgets. This can get complicated when widgets need to talk to eachother. 
 You could argue the Donwload engine is a model 
+
+--------------------
+------10-19-17------
+--------------------
+
+NOTE: missed last class, so some info may be incomplete. It's kind of hard to find good doc umentation on how to do observer pattern in Java, just because it's kind of messy and people just avoid talking about it.
+
+Another summary of Observer Pattern:
+	-interface for callback
+	-list of interfaces/listeners
+	-iterate over listeners to call each handle()
+	
+code examplessssss not complete:
+	
+public class RssView extends VBox {
+	private VBox entriesBox;
+	private TextField pathField;
+	
+	private Vector<PathHandle> pathHandlers;
+	
+	public RssView(){
+		setSpacing(8.0);
+		
+		HBox top = new HBox();
+		
+		pathField = new TextField();
+		
+		Button open = new Button("Choose file");
+		openButton.setOnAction(
+			(ActionEvent event) -> {
+				FileChooser chooser = new FileChooser();
+				chooser.setTitle("Choose");
+				....
+			}
+		);
+		
+		...
+		
+		top.getChildren.addAll(pathField, openButton, readButton);
+		HBox.setHgrow(pathField, Priority.ALWAYS);
+		
+		pathHandlers = new Vector<PathHandler>;
+	}
+	
+	...
+	
+	public void showError(String error){
+		Alert a = new Alert(AlertType.ERROR);
+		a.showAndWait();
+	}
+	
+	...
+}
+
+public class RssController{
+	RssView view = null;
+	RssModel = null;
+	
+	public RssController(RssView view, RssModel model){
+		this.view = view;
+		this.model = model;
+		
+		view.addPathHandler(
+			(String path) -> {
+				try {
+					mode.startFetch(path);
+				} catch (RssException e) {
+					view.showError(re.getMessege());
+				}
+			}
+		);
+		
+		model.addResultHandler(
+			(Vector<RssResult> results) -> {
+				view.showResults(results);
+			}
+		);
+		
+		model.addErrorHandler(
+			(String error) -> {
+				view.showError(error);
+			}
+		);
+		
+		...
+	}
+	
+	...
+}
+
+Moving on, couldn't get all the notes in time. Look into this later: https://www.javacodegeeks.com/2013/08/observer-design-pattern-in-java-example-tutorial.html
+
+What to do about long running jobs? Use threads! Here's how to deal with multithreading. 
+
+Main routine is always contained in the main thread. New threads can be created and terminated in the middle of the process. On some platforms you can even terminate the main thread and keep going as long as there is another thread running. Every language has a slightly different threading API, every operating system has a slightly different threading model. Unix/Linux systems are hella different from Windows. 
+
+In Java, Thread has the method public void run(). One way to use this is to extend Thread and override that method. It's possible for a new thread to be run on a different processor entirely on modern systems. 
+
+Given this, how do you get data out of the thread? If you have some objects (like a file object or something), your threads can access all the resources in the process and interract with those objects. What if two different threads try to access the same function on the same object at the same time?
+
+Suppose you have a shared resource that is a database connection, C. You have thread A and thread B. At some point, A and B are running. Then A calls a method on C, and it beginds to operate. Then B does the same, so there is a window of time where C is being used by both threads. This might mangle the DB, because it's sending queries of two different operations. Unless you build coordination into the threads, they'll do dumb shit like this and garbage up the DB.
+
+What you essentially need to do is acquire a lock, do the thing you want to do, and then release the lock. This lock blocks, and makes other threads wait for it to unlock. So for the example, A causes C to acquire the lock, do a thing, and then release. B will hit the acquire lock step and stop until it can do that. Its copy of the fucntion will run once the lock is released, then it acquires the lock and does the thing.
+
+But what if you code generates an exception in a locked method? That means the lock release could never happen. Bugs can be really tough to solve, since they are so timing-based that they can be hard to recreate. 
+
+So you have a long-running job. You can use these things:
+	>idle-event. runs last in the event loop. You need to be able to chop your giant task up into tiny steps, which is hard as fuuuuck. File IO is a good example of something hard to break up; it can suddenly take a lot of time to do a step, and if it occures in your idle event, it'll lag everything up.
+	>threading. Sharing resources is both useful and dangerous. If a thread directly changes the state of a thing in the middle of its rendering, shit can get weird and fuck up the display. So you need explicit synchronization. You need a rule like this: The states of widgets should never be altered form outside the main thread that owns them. 
+	>background wokers. They do the work on the event thread, way easier to implement. JavaFX and JavaSwing follow this pattern differently: Swing did a good job, but JavaFX was like lol no only pass strings. So we aren't really gonna go into it with JavaFX in this class. 
+	
+JavaFX most prefers to do threading. 
