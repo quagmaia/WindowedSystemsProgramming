@@ -1786,3 +1786,187 @@ So you have a long-running job. You can use these things:
 	>background wokers. They do the work on the event thread, way easier to implement. JavaFX and JavaSwing follow this pattern differently: Swing did a good job, but JavaFX was like lol no only pass strings. So we aren't really gonna go into it with JavaFX in this class. 
 	
 JavaFX most prefers to do threading. 
+
+--------------------
+------10-24-17------
+--------------------
+
+Threading example
+
+public class Contesters {
+	public static void main(String[] args){
+		StringBuffer sb = new StringBuffer();
+		
+		ContesterThread c1 = new ContesterThread(sb);
+		ContesterThread c2 = new ContesterThread(sb);
+		
+		c1.start();
+		c2.start();
+		
+		try{
+			c1.join();
+			c2.join();
+		} catch (InterruptedException e){
+			System.err.println("Managed exceptions are unforgivably stupid");
+		}
+		
+		System.out.println(sb);
+	}
+}
+
+public class ContesterThread extends Thread {
+	StringBuffer sb = null;
+	
+	public ContestorThread(Stringbuffer sb){
+		this.sb = sb;
+	}
+	
+	@overridepublic void run(){
+		for (int i = 0; i < 10; i++){
+			sb.append("iteration: ");
+			sb.append(i);
+			sb.append("\n");
+		}
+	}
+}
+	
+Sometimes in the Contestors class, they just step on eachother and get in the way. It happens at unpredictable times and mangles the buffer, so that you can get weird outputs like "Iteration: Iteration: 88"
+
+The solution? To lock the thing. Use a block called synchronized:
+
+
+public class ContesterThread extends Thread {
+	StringBuffer sb = null;
+	
+	public ContestorThread(Stringbuffer sb){
+		this.sb = sb;
+	}
+	
+	@overridepublic void run(){
+		for (int i = 0; i < 10; i++){
+		synchronized(sb){
+				sb.append("iteration: ");
+				sb.append(i);
+				sb.append("\n");
+			}
+		}
+	}
+}
+
+Usually it looks like you get the output of one thread and then the other. Other times they intermindle (you you get two "Iteration: 1"s in a row). This is probably because there's more than one processor so they're actually simultaneous. 
+
+Now for a more specific JavaFx example.
+
+public class WaitAndAlert extends Application{
+	@override
+	public void start(Stage stage){
+		VBox root = new VBox(8);
+		
+		TextArea text = new TextArea();
+		text.setEditable(false);
+		
+		root.getChildren().add(text);
+		VBox.setVGrow(text, Priority.ALWAYS);
+		
+		Button start = new Button9"start");
+		startButton.setOnAction(
+			(ActionEvent event) -> {
+				Thread th = new Thread() {
+					@Override
+					public void run(){
+						try{
+							Thread.sleep(5000);
+						} catch (Exception e) {
+							//pass, fuck it
+						}
+					}
+				};//anon thread class def
+			}
+		);
+		
+		th.start();
+		//don't call run!!!!! call start. run will just hold up the event loop
+	}
+}
+
+When you press the start button nothing will actually happen in the GUI, the new threads don't update the state, they're just sleeping in the background for 5 seconds. Let's update the GUI when they run. One way to do it is by using idle callbacks to check for state updates by the run method. 
+
+public class WaitAndAlert extends Application{
+	@override
+	public void start(Stage stage){
+		VBox root = new VBox(8);
+		
+		TextArea text = new TextArea();
+		text.setEditable(false);
+		
+		root.getChildren().add(text);
+		VBox.setVGrow(text, Priority.ALWAYS);
+		
+		Button start = new Button9"start");
+		startButton.setOnAction(
+			(ActionEvent event) -> {
+				Thread th = new Thread() {
+					@Override
+					public void run(){
+						try{
+							Thread.sleep(5000);
+						} catch (Exception e) {
+							//pass, fuck it
+						}
+						
+						Platform.runLater(new Runnable(){
+								@Override
+								public void run(){
+									text.setText(
+										text.getText() + "run completed!\n"
+									);
+								}
+							}//anon Runnable class def
+						);
+					}
+				};//anon thread class def
+			}
+		);
+		
+		th.start();
+	}
+}
+
+The reason you do not have to synchronize the Platform.runLater stuff is because it is happening on the mian thread, so they're one at a time. 
+There's a cleaner way.
+
+public class WaitAndAlert extends Application{
+	@override
+	public void start(Stage stage){
+		VBox root = new VBox(8);
+		
+		TextArea text = new TextArea();
+		text.setEditable(false);
+		
+		root.getChildren().add(text);
+		VBox.setVGrow(text, Priority.ALWAYS);
+		
+		Button start = new Button9"start");
+		startButton.setOnAction(
+			(ActionEvent event) -> {
+				Thread th = new Thread() {
+					@Override
+					public void run(){
+						try{
+							Thread.sleep(5000);
+						} catch (Exception e) {
+							//pass, fuck it
+						}
+						
+						//lambda expressions can replace all that stuff up there. You're still making an anonymous class definitions which gets expanded into a real class definition by the compiler.
+						Platform.runLater(
+							() -> text.setText(getText() + "I am a lambda and the run completed!\n")
+						);
+					}
+				};//anon thread class def
+			}
+		);
+		
+		th.start();
+	}
+}
