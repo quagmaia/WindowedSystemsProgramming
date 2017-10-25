@@ -28,11 +28,12 @@ public class Transcode extends GridPane {
 		
 		Button sourceGetter = new Button("Get source");
 		add(sourceGetter, 1, 0);
-		
 		TextField targetText = new TextField();
 		targetText.setDisable(true);
 		setHgrow(targetText,Priority.ALWAYS);
 		add(targetText,0,1);
+		
+		TextArea ga = new TextArea();
 		
 		Button targetGetter = new Button("Get target");
 		add(targetGetter, 1, 1);

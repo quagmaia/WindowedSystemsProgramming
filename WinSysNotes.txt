@@ -1599,19 +1599,19 @@ public class TestSubject{
 	private Vector<TestObserver> observers = new Vector<Observers>
 	
 	public void AddTestEvent(TestObserver to){
-	observers.add)to);
+	observers.add(to);
 	
 	public void removeTestEvent(TestObserver to){
 		observers.remove(to);
 	}
 	
 	public void fireTestEvent(){
-		for (TestObserver to: obserbers)
+		for (TestObserver to: observers)
 			to.Notify();
 	}
 }
 
-In our HWs, TestSubject would just be whatever graphical class we're working on. If HW requires us to do an event handling thing, that's 50% off the grade.
+In our HWs, TestSubject would just be whatever graphical class we're working on. If HW requires us to do an event handling thing, that's 50% of the grade.
 
 --------------------
 ------10-12-17------
