@@ -1970,3 +1970,115 @@ public class WaitAndAlert extends Application{
 		th.start();
 	}
 }
+
+--------------------
+------10-31-17------
+--------------------
+
+Rendering "drawings". how do you make graphics that don't already exist? How do you make it possible to interract with these graphics?
+
+|-0--0--0-|
+How would you draw circles of diameter d, with spaces s on each side of all the circles?
+widget::render(canvas c)
+	cur_center = s + r
+	for p in page_count
+		c.drawcircle(cur_center)
+		c += c + s + l + s + r
+
+widget::get_size()
+	size = pagecount * d + 2*page_count*s + (pagecount-1)*1
+	return size
+
+idk this isn't great pseudocode, hard to follow handwriting.
+
+public class Circles extends Pane {
+	private Vector<PageRequestHandler> pageHandlers;
+	private int pageCount;
+	private int currentPage;
+	private double padding;
+	private double radius;
+	
+	public Circles(){
+		pageHandlers = new Vector<PageHandlers>();
+		pageCount = 0;
+		currentPage = 0;
+		padding = 0;
+		radius = 0;
+	}
+	
+	
+	public void setPageCount(int count) throws CirclesException {
+		if (count < 0){
+			throw new CircllesException("Page count out of bounds");
+		}
+		
+		pageCount = count;
+		
+		this.getChildren().clear();
+		
+		Double curCenter = padding;
+		for (int i = 0; i < count; i++){
+			Circle circle = new Circle(radius,Color.RED);
+			circle.relocate(curCenter, padding);
+			this.getChildren.add(circle);
+			
+			Integer I = new Integer(i);
+			//why use an Integer, not an int?
+			//because regular i CANNOT be marked final!!!
+			
+				//	circle.setOnMouseClicked(
+				//		new EventHandler<MouseEvent>(){
+				//			@Overridepublic void handle(MouseEvent me){
+				//				emitPageEvent(I);
+				//			}
+				//		}
+				//	);
+			//remeber, above is a dumb way to do it, it can be shortened!!!
+			//see below
+			
+			circle.setOnMouseClicked(
+				(MouseEvent ev) -> emitPageEvent(I)
+			);
+			//i cannot be marked final, so you need to use I. 
+			
+			curCenter += radius + radius + padding;
+		}
+		
+		this.setMinWidth(padding + (pageCount * (radius + radius + padding)));
+		this.setMinHeight(padding + radius + radius + padding);
+		
+	}
+	
+	public void setCurrentPage(int page) throws CirclesException {
+		if (page < 0 | page >= pageCount){
+			throw CirclesException("out of range");
+		}
+		
+		int cp = 0;
+		
+		for (Node n: this.getChildren()){
+			if (n instanceof Circle){
+			..... sets color stuff basically
+			}
+		}
+	}
+	
+	public void addPageRequestHandler(PageRequestHandler handler){
+		pageHandlers.add(handler);
+	}
+	
+	public void emitPageEvent(int number){
+		for (PageRequestHandler handler: pageHandlers){
+			handler.handle(number);
+		}
+	}
+}
+
+Integer is essentially a boxing class. Since Integer is a class created with new and handled by reference, it's heap allocated instead of stack allocated. Heap memory only dissapears when the last reference goes away So for Java, Integer is a lexical bandaid. 
+For Java, if a thing is a simple boxing type, it will automatically box or unbox for you (so you don't have to be like I.get() or something).
+It's all just elaborate code beurocracy. 
+
+
+--------------------
+------11-02-17------
+--------------------
