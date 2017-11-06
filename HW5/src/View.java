@@ -1,8 +1,11 @@
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
+import javafx.stage.Window;
+
 import java.util.Vector;
 import javafx.*;
 
@@ -54,6 +57,19 @@ public class View extends GridPane {
 	
 	public void setFilepath(String str) {
 		fileField.setText(str);
+	}
+	
+	public Window getOwnerWindow(){ 
+		Scene parentScene = this.getScene();
+		if (parentScene != null){
+			return parentScene.getWindow();
+		}
+		return null;
+	}
+	
+	public void displayAlert(AlertType type, String message) {
+		Alert a = new Alert(type, message);
+		a.showAndWait();
 	}
 
 }

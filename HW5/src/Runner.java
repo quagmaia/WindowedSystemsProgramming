@@ -20,7 +20,7 @@ public class Runner extends Application {
 		View view = new View();
 		Controller controller = new Controller(view);
 		
-	stage.setScene(new Scene(view,300,200));
+		stage.setScene(new Scene(view,300,200));
 		stage.show();
 		
 	}
