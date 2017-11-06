@@ -1,4 +1,4 @@
 @FunctionalInterface
 public interface BasicHandler {
-	public void handle(String string);
+	public void handle();
 }

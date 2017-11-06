@@ -7,27 +7,53 @@ import java.util.Vector;
 import javafx.*;
 
 public class View extends GridPane {
-	
-	public Vector<BasicHandler> handlers = new Vector<BasicHandler>();
-	
-	public void addBasicHandler(BasicHandler bh){
-		handlers.add(bh);
+
+	public Vector<BasicHandler> bHandlers = new Vector<BasicHandler>();
+	public Vector<StringHandler> sHandlers = new Vector<StringHandler>();
+
+	public void addHandler(BasicHandler bh) {
+		bHandlers.add(bh);
 	}
-	
-	public View () {
-		
-		TextField urlField = new TextField("URL Location");
+
+	public void addHandler(StringHandler sh) {
+		sHandlers.add(sh);
+	}
+
+	TextField fileField = new TextField("");
+	TextField urlField = new TextField("URL Location");
+	Button selectFile = new Button("Select file");
+	Button startDownload = new Button("Start download");
+
+	public View() {
+
 		add(urlField, 0, 0);
-		
-		TextField fileField = new TextField("");
+
+		fileField.setEditable(false);
 		add(fileField, 0, 1);
-		
-		Button selectFile = new Button("Select file");
+
 		add(selectFile, 1, 1);
-		
-		Button startDownload = new Button("Start download");
-		add(startDownload,0,2);
-		
+
+		add(startDownload, 0, 2);
+
+		selectFile.setOnAction((event) -> {
+			for (BasicHandler bh : bHandlers) {
+				bh.handle();
+			}
+		});
+
+		startDownload.setOnAction((event) -> {
+			String url = urlField.getText();
+			String filepath = fileField.getText();
+			for (StringHandler sh : sHandlers) {
+				sh.handle(url, filepath);
+			}
+
+		});
+
 	}
-		
+	
+	public void setFilepath(String str) {
+		fileField.setText(str);
+	}
+
 }
