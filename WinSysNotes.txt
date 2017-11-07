@@ -2177,12 +2177,15 @@ public class FileDrag extends Pane{
 		
 		rect.setOnDragEntered(
 			(DragEvent event) -> {
-				if (event.getSource() != rect && ....
+				if (event.getDragBoard().HasFiles()){
+					event.acceptTransferModes(TransferMode.COPY);
+				}
 			}
 		);
 		
 		rect.setOnDragOver(
-			(DragEvent event) -> { //set to TransferMode.COPY...
+			(DragEvent event) -> { 
+			if (event.g
 			}
 		
 		);
@@ -2190,6 +2193,12 @@ public class FileDrag extends Pane{
 		rect.setOnDragDropped(
 			DragEvent event) -> {
 				//save file paths of all files dragged inside and print them
+				if (event.getDragBoard().HasFiles()){
+					for (File f: event.getDragBoard().getFiles()){
+						System.out.println(f.getPath());
+					}
+				}
+				event.consume();
 			}
 		);
 	
