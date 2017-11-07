@@ -2080,5 +2080,120 @@ It's all just elaborate code beurocracy.
 
 
 --------------------
-------11-02-17------
+------11-07-17------
 --------------------
+
+Test next week on Thursday, 16th, and will cover HWs 3,4, and 5. After Thanksgiving week is the first week of project presentations.
+
+Drag and drop! JavaFX does it in a pretty typical way, it's implemented as a series of events that you can respond to. Usually, commonly, you're going to have some set of ON_DRAG_ENTER, ON_DRAG_DROP, and ON_DRAG_LEAVE events. All NODE widgets have these events built in to them, which makes life easier.
+
+public class DragApp extends Application {
+	@Override
+	public void start(Stage stage){
+	InternalDrag id = new InternalDrag();
+	FileDrag fd = new FileDrag();
+	
+	VBox root = nw VBox();
+	...//you know the rest
+	}
+}
+
+
+public class InternalDrag extends Pane{
+	public InternalDrag(){
+		Test source = new Text(START DRAG HERE);
+		source.relocate(50.0,50.0);
+		source.setFond(new Font(48.0));
+		
+		source.setOnDragDetected(
+			(MouseEvent event) -> {
+				Dragboard db = source.startDragAndDrop(TransferMode.ANY);
+				ClipboardContent content = new ClipboardContent();
+				content.putString(source.getText());
+				//ClipBoards can accept a lot of different inputs, like files and stuff.
+				
+				db.setContent(content);
+				event,consume();
+				//consume tells the system to not continue to propogate this event. so do not push the event up
+			}
+		);
+		
+		source.setOnDragDone{
+			...
+		}
+		
+		text target = new Test(DRAG HERE);
+		target.relocate(50.0,50.0);
+		target.setFond(new Font(48.0));
+		
+		source.setOnDragOver(
+			(DragEvent event) -> {
+				if (event.getDragboard().hasString()){
+					event.acceptTransferMode(TransferMode.MOVE);
+				}
+				event.consume();
+			}
+		);
+		
+		target.setOnDragDropped(
+			(DragEvent event) -> {
+				DragBoard db = event.getDragboard();
+				boolean success = false;
+				if (db.hasString()){
+					System.out.ptintln(db.getString());
+					success = true;
+				}
+				event.setDropCompleted(success);
+				event.consume();
+			}
+		);
+		
+		target.setOnDragEntered(
+			(DragEvent event) -> {
+				if (event.getGestureSource() != target && event.getDragboard.hasString()){
+					target.setFill(Color.GREEN);
+				}
+				event.consume();
+			}
+		);
+		
+		target.setOnDragExited{
+			(DragEvent event) -> {
+				target.setFill(Color.BLACK);
+				event.consume();
+			}
+		}
+	}
+
+}
+
+public class FileDrag extends Pane{
+	public FileDrag(){
+		Rectangle rect = new Rectangle();
+		rect.relocate(50,50);
+		rect.setWidth(300.0);
+		rect.setHeight(100);
+		sect.setFillColor(Color.LIGHTGREEN);
+		
+		rect.setOnDragEntered(
+			(DragEvent event) -> {
+				if (event.getSource() != rect && ....
+			}
+		);
+		
+		rect.setOnDragOver(
+			(DragEvent event) -> { //set to TransferMode.COPY...
+			}
+		
+		);
+		
+		rect.setOnDragDropped(
+			DragEvent event) -> {
+				//save file paths of all files dragged inside and print them
+			}
+		);
+	
+	}
+}
+
+I just can't really type fast enough to keep up, sigh. But this system for file dragging is kind of buggy, beware. 
