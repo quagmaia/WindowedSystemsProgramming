@@ -3,7 +3,8 @@ import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.nio.file.CopyOption;
+import java.nio.file.*;
+import java.nio.file.StandardCopyOption;
 import java.util.Vector;
 
 import javafx.stage.FileChooser;
@@ -11,6 +12,7 @@ import javafx.stage.Window;
 
 public class Model {
 	
+	private static final CopyOption StandardCopyOption = null;
 	public Vector<BasicHandler> bHandlers = new Vector<BasicHandler>();
 	public Vector<StringHandler> sHandlers = new Vector<StringHandler>();
 
@@ -26,7 +28,9 @@ public class Model {
 	public void startDownload(String url, String filepath) {
 		try {
 			URL webpage = new URL(url);
-			Download();
+			Path target = Paths.get(filepath);
+			
+			Download(webpage, target);
 		}catch(Exception e){
 			reportFailure(e.getMessage(),e.getStackTrace().toString());
 		}
@@ -42,9 +46,9 @@ public class Model {
 		return null;
 	}
 	
-	public void Download() {
-		try {
-			//initiate download
+	public void Download(URL webpage, Path target) {
+		try (InputStream in = webpage.openStream()){
+			Files.copy(in, target);
 		}catch(Exception e) {
 			reportFailure(e.getMessage(),e.getStackTrace().toString());
 		}
