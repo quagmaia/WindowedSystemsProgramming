@@ -1,0 +1,3 @@
+enum States {
+	INITIAL, CLICKED;
+}
