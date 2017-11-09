@@ -16,6 +16,7 @@ import javafx.beans.binding.*;
 
 
 public class CircleMover extends Pane {
+	
     private enum States {
         INITIAL, CLICKED, ANIMATING;
     }
@@ -80,8 +81,18 @@ public class CircleMover extends Pane {
         KeyFrame end = new KeyFrame(Duration.millis(5000),
                                     new KeyValue(animCircle.translateXProperty(), secondX),
                                     new KeyValue(animCircle.translateYProperty(), secondY));
+        
+       /* also valid. you don't need to include many values
+        *  KeyFrame middle = new KeyFrame(Duration.millis(2000),
+        *							new KeyValue(animCircle.translateXProperty(), 0.0));
+        */
+        
+       KeyFrame middle = new KeyFrame(Duration.millis(2000),
+        							new KeyValue(animCircle.translateXProperty(), 0.0),
+        							new KeyValue(animCircle.translateYProperty(), 0.0));
+        
         //now adding to the animation. parts between keyframes get filled in 
-        tl.getKeyFrames().addAll(start, end);
+        tl.getKeyFrames().addAll(start, end, middle);
         
         //you could declare those two keyframes in different orders and it wouldn't matter. 
         //it's Duration.millis() that determines when it happens in the animation.
