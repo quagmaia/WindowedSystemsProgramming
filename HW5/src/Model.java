@@ -52,12 +52,14 @@ public class Model {
 		try {
 			dt.join();
 		}catch (Exception e) {
-			reportFailure(e.getMessage(), e.getStackTrace().toString());
+			String message = e.getMessage();
+			reportFailure(message, e.getStackTrace().toString());
 		}
 		
-		if (dt.getStatus() == Status.SUCCESS) {
+		Status threadStatus = dt.getStatus();
+		if (threadStatus == Status.SUCCESS) {
 			reportSuccess();
-		} else if (dt.getStatus() == Status.FAILURE) {
+		} else if (threadStatus == Status.FAILURE) {
 			reportFailure(dt.getMessage(),null);
 		}
 	}

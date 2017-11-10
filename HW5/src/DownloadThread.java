@@ -2,6 +2,7 @@ import java.io.InputStream;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.util.Vector;
 
 enum Status {
@@ -24,7 +25,7 @@ public class DownloadThread extends Thread {
 	@Override
 	public void run() {
 		try (InputStream in = webpage.openStream()){
-			Files.copy(in, target);
+			Files.copy(in, target,StandardCopyOption.REPLACE_EXISTING);
 			currStatus = Status.SUCCESS;
 			message = "Success!";
 		}catch(Exception e) {
