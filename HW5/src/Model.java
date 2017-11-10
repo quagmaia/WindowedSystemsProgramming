@@ -7,6 +7,7 @@ import java.nio.file.*;
 import java.nio.file.StandardCopyOption;
 import java.util.Vector;
 
+import javafx.scene.control.Alert.AlertType;
 import javafx.stage.FileChooser;
 import javafx.stage.Window;
 
@@ -47,10 +48,17 @@ public class Model {
 	}
 	
 	public void Download(URL webpage, Path target) {
-		try (InputStream in = webpage.openStream()){
-			Files.copy(in, target);
-		}catch(Exception e) {
-			reportFailure(e.getMessage(),e.getStackTrace().toString());
+		DownloadThread dt = new DownloadThread(webpage, target);
+		try {
+			dt.join();
+		}catch (Exception e) {
+			reportFailure(e.getMessage(), e.getStackTrace().toString());
+		}
+		
+		if (dt.getStatus() == Status.SUCCESS) {
+			reportSuccess();
+		} else if (dt.getStatus() == Status.FAILURE) {
+			reportFailure(dt.getMessage(),null);
 		}
 	}
 	

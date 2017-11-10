@@ -28,8 +28,16 @@ public class Controller {
 			model.addHandler(
 					(String str1, String str2) -> {
 						view.displayAlert(AlertType.ERROR, "Following exception occured:" + str1);
+						System.out.println(str2);
 					}
 				);
+			
+			model.addHandler(
+					() -> {
+						view.displayAlert(AlertType.INFORMATION, "Download was succesful.");
+					}
+				);
+			
 			
 		}
 		
