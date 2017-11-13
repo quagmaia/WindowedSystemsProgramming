@@ -5,6 +5,8 @@ import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.util.Vector;
 
+import javafx.application.Platform;
+
 enum Status {
 	PENDING, SUCCESS, FAILURE
 }
@@ -25,9 +27,12 @@ public class DownloadThread extends Thread {
 	@Override
 	public void run() {
 		try (InputStream in = webpage.openStream()){
-			Files.copy(in, target,StandardCopyOption.REPLACE_EXISTING);
+			synchronized(in) {
+				Files.copy(in, target,StandardCopyOption.REPLACE_EXISTING);
+			}
 			currStatus = Status.SUCCESS;
 			message = "Success!";
+			System.out.println(message);
 		}catch(Exception e) {
 			currStatus = Status.FAILURE;
 			message = e.getMessage();

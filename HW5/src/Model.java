@@ -7,6 +7,7 @@ import java.nio.file.*;
 import java.nio.file.StandardCopyOption;
 import java.util.Vector;
 
+import javafx.application.Platform;
 import javafx.scene.control.Alert.AlertType;
 import javafx.stage.FileChooser;
 import javafx.stage.Window;
@@ -50,7 +51,7 @@ public class Model {
 	public void Download(URL webpage, Path target) {
 		DownloadThread dt = new DownloadThread(webpage, target);
 		try {
-			dt.join();
+			dt.start();
 		}catch (Exception e) {
 			String message = e.getMessage();
 			reportFailure(message, e.getStackTrace().toString());
@@ -63,6 +64,25 @@ public class Model {
 			reportFailure(dt.getMessage(),null);
 		}
 	}
+	
+	/*public void Download(URL webpage, Path target) {
+		Thread t = new Thread() {
+			@Override
+			public void run(){
+				try{
+					Thread.sleep(5000);
+				} catch (Exception e) {
+					//pass, fuck it
+				}
+				
+				//lambda expressions can replace all that stuff up there. You're still making an anonymous class definitions which gets expanded into a real class definition by the compiler.
+				Platform.runLater(
+					() -> System.out.println("I am a lambda and the run completed!\n")
+				);
+			}
+		};//anon thread class def
+		t.start();
+	}*/
 	
 	private void reportSuccess() {
 		for (BasicHandler bh : bHandlers) {
